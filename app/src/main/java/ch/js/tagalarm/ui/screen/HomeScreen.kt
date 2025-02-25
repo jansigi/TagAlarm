@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(modifier: Modifier = Modifier, onSettingsOpen: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -28,7 +28,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 actions = {
                     TextButton(
                         onClick = {
-                            // TODO open SettingsScreen
+                            onSettingsOpen()
                         },
                     ) {
                         Text(
