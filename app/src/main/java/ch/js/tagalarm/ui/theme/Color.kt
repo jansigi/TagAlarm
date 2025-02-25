@@ -1,4 +1,4 @@
-package ch.js.tagname.ui.theme
+package ch.js.tagalarm.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

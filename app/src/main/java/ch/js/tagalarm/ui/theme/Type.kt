@@ -1,4 +1,4 @@
-package ch.js.tagname.ui.theme
+package ch.js.tagalarm.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

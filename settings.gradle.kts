@@ -19,6 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "TagName"
+rootProject.name = "TagAlarm"
 include(":app")
- 

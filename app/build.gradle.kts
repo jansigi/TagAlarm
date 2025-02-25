@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "ch.js.tagname"
+    namespace = "ch.js.tagalarm"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "ch.js.tagname"
+        applicationId = "ch.js.tagalarm"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

@@ -1,4 +1,4 @@
-package ch.js.tagname
+package ch.js.tagalarm
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
