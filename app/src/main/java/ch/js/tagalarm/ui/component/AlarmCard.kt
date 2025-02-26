@@ -1,4 +1,4 @@
-package ch.js.tagalarm.ui.screen
+package ch.js.tagalarm.ui.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -15,17 +15,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import ch.js.tagalarm.AlarmNav
 import ch.js.tagalarm.data.Alarm
+import ch.js.tagalarm.viewmodel.AlarmViewModel
 
 @Composable
-fun AlarmCard(alarm: Alarm, onActiveToggle: () -> Unit) {
+fun AlarmCard(alarm: Alarm, navController: NavController, alarmViewModel: AlarmViewModel = viewModel()) {
     Card(
         modifier = Modifier
             .padding(10.dp)
             .fillMaxWidth()
             .height(90.dp)
             .clickable {
-                // TODO open editor
+                navController.navigate(AlarmNav(alarm.id.toString()))
             },
     ) {
         Column(
@@ -41,7 +45,7 @@ fun AlarmCard(alarm: Alarm, onActiveToggle: () -> Unit) {
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f),
                 )
-                Switch(alarm.active, onCheckedChange = { onActiveToggle() })
+                Switch(alarm.active, onCheckedChange = { alarmViewModel.toggleActive(alarm) })
             }
             Text(alarm.description)
         }

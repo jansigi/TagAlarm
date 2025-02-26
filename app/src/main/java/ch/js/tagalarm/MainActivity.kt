@@ -11,10 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import ch.js.tagalarm.ui.screen.HomeScreen
-import ch.js.tagalarm.ui.screen.SettingsScreen
+import androidx.navigation.toRoute
+import ch.js.tagalarm.ui.component.AlarmScreen
+import ch.js.tagalarm.ui.component.HomeScreen
+import ch.js.tagalarm.ui.component.SettingsScreen
 import ch.js.tagalarm.ui.theme.TagAlarmTheme
 import kotlinx.serialization.Serializable
+import java.util.UUID
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,15 +31,17 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = Home,
                     ) {
+                        val modifier = Modifier.padding(innerPadding)
                         composable<Home> {
-                            HomeScreen(modifier = Modifier.padding(innerPadding)) {
-                                navController.navigate(Settings)
-                            }
+                            HomeScreen(modifier = modifier, navController = navController)
                         }
                         composable<Settings> {
-                            SettingsScreen(modifier = Modifier.padding(innerPadding)) {
-                                navController.navigate(Home)
-                            }
+                            SettingsScreen(modifier = modifier, navController = navController)
+                        }
+                        composable<AlarmNav> {
+                            val alarmNav = it.toRoute<AlarmNav>()
+                            val alarmId = evaluateUuid(alarmNav.alarmId)
+                            AlarmScreen(modifier = modifier, navController = navController, alarmId = alarmId)
                         }
                     }
                 }
@@ -46,7 +51,19 @@ class MainActivity : ComponentActivity() {
 }
 
 @Serializable
-private object Home
+object Home
 
 @Serializable
-private object Settings
+object Settings
+
+@Serializable
+class AlarmNav(
+    val alarmId: String,
+)
+
+private fun evaluateUuid(alarmId: String): UUID? =
+    if (alarmId.isEmpty()) {
+        null
+    } else {
+        UUID.fromString(alarmId)
+    }

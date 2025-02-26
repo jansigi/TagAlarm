@@ -6,11 +6,11 @@ import androidx.lifecycle.ViewModel
 import ch.js.tagalarm.data.Alarm
 import ch.js.tagalarm.data.NfcTag
 import java.time.LocalTime
-import java.util.UUID
 
 class AlarmViewModel : ViewModel() {
     private var _alarms = mutableStateOf(
-        listOf( // TODO remove and replace with local storage
+        listOf(
+            // TODO remove and replace with local storage
             Alarm(time = LocalTime.of(6, 30), active = false, nfcTag = NfcTag("1")),
             Alarm(time = LocalTime.of(7, 0), active = true, nfcTag = NfcTag("2")),
         ),
@@ -19,14 +19,12 @@ class AlarmViewModel : ViewModel() {
     val alarms: State<List<Alarm>>
         get() = _alarms
 
-    fun toggleActive(id: UUID) {
-        _alarms.value.find { it.id == id }?.let { alarm ->
-            _alarms.value = _alarms.value.map {
-                if (it.id == id) {
-                    alarm.copy(active = !alarm.active)
-                } else {
-                    it
-                }
+    fun toggleActive(alarm: Alarm) {
+        _alarms.value = _alarms.value.map {
+            if (it.id == alarm.id) {
+                alarm.copy(active = !alarm.active)
+            } else {
+                it
             }
         }
     }
