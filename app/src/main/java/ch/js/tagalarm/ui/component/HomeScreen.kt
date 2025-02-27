@@ -1,7 +1,8 @@
 package ch.js.tagalarm.ui.component
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -32,6 +34,7 @@ fun HomeScreen(
 ) {
     val alarmViewModel: AlarmViewModel = hiltViewModel<AlarmViewModel>()
     val alarms by alarmViewModel.alarms.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -57,19 +60,31 @@ fun HomeScreen(
                 },
             )
         },
-    ) { padding ->
-        Box(modifier = modifier.padding(padding)) {
-            LazyColumn(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-                items(alarms) {
-                    AlarmCard(it, navController)
+    ) { innerPadding ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                items(alarms) { alarm ->
+                    AlarmCard(alarm, navController)
                 }
             }
             Button(
                 onClick = {
                     navController.navigate(AlarmNav(""))
                 },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             ) {
-                Text("create")
+                Text(text = "Create Alarm")
             }
         }
     }
