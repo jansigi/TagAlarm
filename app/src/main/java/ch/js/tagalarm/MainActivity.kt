@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -16,9 +17,10 @@ import ch.js.tagalarm.ui.component.AlarmScreen
 import ch.js.tagalarm.ui.component.HomeScreen
 import ch.js.tagalarm.ui.component.SettingsScreen
 import ch.js.tagalarm.ui.theme.TagAlarmTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
-import java.util.UUID
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,8 +42,8 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<AlarmNav> {
                             val alarmNav = it.toRoute<AlarmNav>()
-                            val alarmId = evaluateUuid(alarmNav.alarmId)
-                            AlarmScreen(modifier = modifier, navController = navController, alarmId = alarmId)
+                            val alarmId = alarmNav.alarmId.toLongOrNull()
+                            AlarmScreen(modifier = modifier, navController = navController, context = LocalContext.current, alarmId = alarmId)
                         }
                     }
                 }
@@ -60,10 +62,3 @@ object Settings
 class AlarmNav(
     val alarmId: String,
 )
-
-private fun evaluateUuid(alarmId: String): UUID? =
-    if (alarmId.isEmpty()) {
-        null
-    } else {
-        UUID.fromString(alarmId)
-    }

@@ -15,14 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import ch.js.tagalarm.AlarmNav
-import ch.js.tagalarm.data.Alarm
+import ch.js.tagalarm.data.model.Alarm
 import ch.js.tagalarm.viewmodel.AlarmViewModel
 
 @Composable
-fun AlarmCard(alarm: Alarm, navController: NavController, alarmViewModel: AlarmViewModel = viewModel()) {
+fun AlarmCard(alarm: Alarm, navController: NavController) {
+    val alarmViewModel: AlarmViewModel = hiltViewModel<AlarmViewModel>()
     Card(
         modifier = Modifier
             .padding(10.dp)
@@ -45,7 +46,12 @@ fun AlarmCard(alarm: Alarm, navController: NavController, alarmViewModel: AlarmV
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f),
                 )
-                Switch(alarm.active, onCheckedChange = { alarmViewModel.toggleActive(alarm) })
+                Switch(
+                    alarm.active,
+                    onCheckedChange = {
+                        alarmViewModel.toggleActive(alarm)
+                    },
+                )
             }
             Text(alarm.description)
         }

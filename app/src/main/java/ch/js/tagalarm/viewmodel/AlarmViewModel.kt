@@ -1,31 +1,47 @@
 package ch.js.tagalarm.viewmodel
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import ch.js.tagalarm.data.Alarm
-import ch.js.tagalarm.data.NfcTag
-import java.time.LocalTime
+import androidx.lifecycle.viewModelScope
+import ch.js.tagalarm.data.db.AlarmRepository
+import ch.js.tagalarm.data.model.Alarm
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AlarmViewModel : ViewModel() {
-    private var _alarms = mutableStateOf(
-        listOf(
-            // TODO remove and replace with local storage
-            Alarm(time = LocalTime.of(6, 30), active = false, nfcTag = NfcTag("1")),
-            Alarm(time = LocalTime.of(7, 0), active = true, nfcTag = NfcTag("2")),
-        ),
-    )
-
-    val alarms: State<List<Alarm>>
-        get() = _alarms
+@HiltViewModel
+class AlarmViewModel @Inject constructor(
+    private val alarmRepository: AlarmRepository,
+) : ViewModel() {
+    private val _alarms = MutableStateFlow(emptyList<Alarm>())
+    val alarms = _alarms
+        .onStart {
+            viewModelScope.launch {
+                update()
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun toggleActive(alarm: Alarm) {
-        _alarms.value = _alarms.value.map {
-            if (it.id == alarm.id) {
-                alarm.copy(active = !alarm.active)
-            } else {
-                it
-            }
+        viewModelScope.launch {
+            alarmRepository.saveAlarm(alarm.copy(active = !alarm.active))
+            update()
+        }
+    }
+
+    fun removeAlarm(id: Long?) {
+        viewModelScope.launch {
+            alarmRepository.deleteAlarm(id)
+            update()
+        }
+    }
+
+    private suspend fun update() {
+        alarmRepository.getAllAlarms().let { allAlarms ->
+            _alarms.update { allAlarms }
         }
     }
 }
