@@ -1,22 +1,35 @@
 package ch.js.tagalarm.ui.component
 
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
-import ch.js.tagalarm.Home
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import ch.js.tagalarm.ui.Screen
 
 @Composable
-fun SettingsScreen(modifier: Modifier = Modifier, navController: NavHostController) {
-    Row(modifier = modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
-        Button(onClick = { navController.navigate(Home) }) {
-            Text(text = "<-")
+fun SettingsScreen(
+    navController: NavController,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(text = "Settings Screen")
+        Button(
+            onClick = { navController.navigate(Screen.HOME.route) },
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text(text = "Back to Home")
         }
-        Text(text = "Settings")
     }
-    // TODO implement SettingsScreen
 }

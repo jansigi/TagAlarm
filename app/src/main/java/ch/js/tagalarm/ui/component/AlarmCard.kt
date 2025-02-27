@@ -17,20 +17,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import ch.js.tagalarm.AlarmNav
 import ch.js.tagalarm.data.model.Alarm
+import ch.js.tagalarm.ui.Screen
 import ch.js.tagalarm.viewmodel.AlarmViewModel
 
 @Composable
 fun AlarmCard(alarm: Alarm, navController: NavController) {
-    val alarmViewModel: AlarmViewModel = hiltViewModel<AlarmViewModel>()
+    val alarmViewModel: AlarmViewModel = hiltViewModel()
     Card(
         modifier = Modifier
             .padding(10.dp)
             .fillMaxWidth()
             .height(90.dp)
             .clickable {
-                navController.navigate(AlarmNav(alarm.id.toString()))
+                navController.navigate(Screen.ALARM_EDIT.route + "?alarmId=${alarm.id}")
             },
     ) {
         Column(
@@ -47,7 +47,7 @@ fun AlarmCard(alarm: Alarm, navController: NavController) {
                     modifier = Modifier.weight(1f),
                 )
                 Switch(
-                    alarm.active,
+                    checked = alarm.active,
                     onCheckedChange = {
                         alarmViewModel.toggleActive(alarm)
                     },

@@ -26,6 +26,13 @@ class AlarmViewModel @Inject constructor(
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    fun saveAlarm(alarm: Alarm) {
+        viewModelScope.launch {
+            alarmRepository.saveAlarm(alarm)
+            update()
+        }
+    }
+
     fun toggleActive(alarm: Alarm) {
         viewModelScope.launch {
             alarmRepository.saveAlarm(alarm.copy(active = !alarm.active))
