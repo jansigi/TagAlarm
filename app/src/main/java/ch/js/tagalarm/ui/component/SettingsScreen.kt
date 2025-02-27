@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ch.js.tagalarm.ui.Screen
 import ch.js.tagalarm.viewmodel.AlarmViewModel
-import java.util.UUID
 
 @Composable
 fun SettingsScreen(
@@ -51,7 +50,6 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.padding(8.dp))
 
-        // List all tags
         LazyColumn {
             items(nfcTags) { tag ->
                 Row(
@@ -60,15 +58,11 @@ fun SettingsScreen(
                         .fillMaxWidth()
                         .padding(vertical = 4.dp),
                 ) {
-                    // Show the name or serial
                     Text(
                         text = tag.name,
                         modifier = Modifier.weight(1f),
                     )
-                    // Show the serial number
                     Text(text = tag.serialNumber)
-
-                    // Delete button
                     IconButton(
                         onClick = {
                             alarmViewModel.deleteNfcTag(tag.serialNumber)
@@ -82,16 +76,12 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.padding(8.dp))
 
-        // "Add new +" button
         Button(
             onClick = {
-                // Placeholder scanning approach:
-                // In a real app, you'd launch an NFC scan and retrieve the actual serialNumber
-                val fakeSerial = "FAKE-${UUID.randomUUID()}"
-                alarmViewModel.addNfcTag(name = "Bathroom-Tag", serialNumber = fakeSerial)
+                navController.navigate(Screen.NFC_SCAN.route)
             },
         ) {
-            Text(text = "Add new +")
+            Text(text = "Scan New Tag")
         }
     }
 }

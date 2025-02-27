@@ -2,16 +2,28 @@ package ch.js.tagalarm.ui.component
 
 import android.app.TimePickerDialog
 import android.content.Context
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -27,28 +39,26 @@ fun AlarmEditScreen(
     alarmViewModel: AlarmViewModel,
     alarmId: Long? = null,
 ) {
-    // Observe all alarms so we can find the existing one (if alarmId != null)
     val alarmsState by alarmViewModel.alarms.collectAsState()
+    val nfcTagsState by alarmViewModel.nfcTags.collectAsState()
+
     val existingAlarm = alarmsState.find { it.id == alarmId }
 
-    // We store the current context for launching TimePickerDialog
-    val context = LocalContext.current
-
-    // Initialize UI state from the existing alarm if present, else defaults
     var time by remember { mutableStateOf(existingAlarm?.time ?: LocalTime.of(LocalTime.now().hour, LocalTime.now().minute)) }
     var description by remember { mutableStateOf(existingAlarm?.description ?: "New Alarm") }
-    var nfcSerial by remember { mutableStateOf(existingAlarm?.nfcSerial ?: "") }
-
-    // Show/hide the time picker dialog
+    var selectedNfcTagSerial by remember { mutableStateOf(existingAlarm?.nfcSerial ?: "") }
     var showTimePicker by remember { mutableStateOf(false) }
+
     if (showTimePicker) {
         showTimePickerDialog(
-            context = context,
+            context = LocalContext.current,
             initialTime = time,
             onTimeSelected = { selectedTime ->
                 time = selectedTime
             },
-            onDismiss = { showTimePicker = false },
+            onDismiss = {
+                showTimePicker = false
+            },
         )
     }
 
@@ -61,7 +71,6 @@ fun AlarmEditScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Time Picker
         Button(
             onClick = { showTimePicker = true },
         ) {
@@ -78,24 +87,62 @@ fun AlarmEditScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
-            value = nfcSerial,
-            onValueChange = { nfcSerial = it },
-            label = { Text("NFC Tag Serial (Optional)") },
-        )
+        Text(text = "Select an NFC Tag:")
+        var mExpanded by remember { mutableStateOf(false) }
+        Box {
+            OutlinedTextField(
+                value = selectedNfcTagSerial,
+                onValueChange = {},
+                readOnly = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { mExpanded = true },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = "Dropdown Arrow",
+                        modifier = Modifier.clickable { mExpanded = true },
+                    )
+                },
+            )
+
+            DropdownMenu(
+                expanded = mExpanded,
+                onDismissRequest = { mExpanded = false },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                nfcTagsState.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(item.name + item.serialNumber) },
+                        onClick = {
+                            selectedNfcTagSerial = item.serialNumber
+                            mExpanded = false
+                        },
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(
+            onClick = {
+                navController.navigate(Screen.NFC_SCAN.route)
+            },
+        ) {
+            Text("Scan New Tag")
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Save button
         Button(
             onClick = {
-                // Build the Alarm object
                 val alarm = Alarm(
-                    id = existingAlarm?.id, // If this is an edit, reuse the ID
+                    id = existingAlarm?.id,
                     time = time,
                     active = true,
                     description = description,
-                    nfcSerial = nfcSerial.ifBlank { null },
+                    nfcSerial = selectedNfcTagSerial.ifBlank { null },
                 )
                 alarmViewModel.saveAlarm(alarm)
                 navController.navigate(Screen.HOME.route)
@@ -106,7 +153,6 @@ fun AlarmEditScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Delete button if editing an existing alarm
         if (existingAlarm != null) {
             Button(
                 onClick = {
@@ -125,9 +171,6 @@ fun AlarmEditScreen(
     }
 }
 
-/**
- * Helper function to show a TimePickerDialog from within a Compose context.
- */
 private fun showTimePickerDialog(
     context: Context,
     initialTime: LocalTime,
@@ -145,7 +188,7 @@ private fun showTimePickerDialog(
         },
         hour,
         minute,
-        true, // 24-hour format
+        true,
     )
     dialog.setOnCancelListener { onDismiss() }
     dialog.show()

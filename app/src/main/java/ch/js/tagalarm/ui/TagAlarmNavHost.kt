@@ -4,21 +4,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.navigation.NavType
 import ch.js.tagalarm.ui.component.AlarmEditScreen
 import ch.js.tagalarm.ui.component.HomeScreen
+import ch.js.tagalarm.ui.component.NfcScanScreen
 import ch.js.tagalarm.ui.component.SettingsScreen
 import ch.js.tagalarm.viewmodel.AlarmViewModel
 
 enum class Screen(val route: String) {
     HOME("home"),
     SETTINGS("settings"),
-    // We’ll allow an optional alarmId query parameter for editing
     ALARM_EDIT("alarmEdit"),
+    NFC_SCAN("nfcScan")
 }
 
 @Composable
@@ -57,6 +58,13 @@ fun TagAlarmNavHost(
                 navController = navController,
                 alarmViewModel = alarmViewModel,
                 alarmId = alarmId,
+            )
+        }
+
+        composable(Screen.NFC_SCAN.route) {
+            NfcScanScreen(
+                navController = navController,
+                alarmViewModel = alarmViewModel
             )
         }
     }
