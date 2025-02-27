@@ -73,7 +73,7 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.Top,
             ) {
                 items(alarmsState) { alarm ->
-                    AlarmCard(alarm, navController)
+                    AlarmCard(alarm, navController, alarmViewModel)
                 }
             }
 

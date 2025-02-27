@@ -22,8 +22,7 @@ import ch.js.tagalarm.ui.Screen
 import ch.js.tagalarm.viewmodel.AlarmViewModel
 
 @Composable
-fun AlarmCard(alarm: Alarm, navController: NavController) {
-    val alarmViewModel: AlarmViewModel = hiltViewModel()
+fun AlarmCard(alarm: Alarm, navController: NavController, alarmViewModel: AlarmViewModel) {
     Card(
         modifier = Modifier
             .padding(10.dp)

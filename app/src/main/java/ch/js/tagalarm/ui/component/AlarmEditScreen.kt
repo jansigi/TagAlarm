@@ -35,8 +35,7 @@ fun AlarmEditScreen(
     val context = LocalContext.current
 
     // Initialize UI state from the existing alarm if present, else defaults
-    var time by remember { mutableStateOf(existingAlarm?.time ?: LocalTime.of(7, 0)) }
-    var active by remember { mutableStateOf(existingAlarm?.active ?: false) }
+    var time by remember { mutableStateOf(existingAlarm?.time ?: LocalTime.of(LocalTime.now().hour, LocalTime.now().minute)) }
     var description by remember { mutableStateOf(existingAlarm?.description ?: "New Alarm") }
     var nfcSerial by remember { mutableStateOf(existingAlarm?.nfcSerial ?: "") }
 
@@ -85,14 +84,6 @@ fun AlarmEditScreen(
             label = { Text("NFC Tag Serial (Optional)") },
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Switch(
-            checked = active,
-            onCheckedChange = { active = it },
-        )
-        Text(text = if (active) "Active" else "Inactive")
-
         Spacer(modifier = Modifier.height(16.dp))
 
         // Save button
@@ -102,9 +93,9 @@ fun AlarmEditScreen(
                 val alarm = Alarm(
                     id = existingAlarm?.id, // If this is an edit, reuse the ID
                     time = time,
-                    active = active,
+                    active = true,
                     description = description,
-                    nfcSerial = if (nfcSerial.isNotBlank()) nfcSerial else null,
+                    nfcSerial = nfcSerial.ifBlank { null },
                 )
                 alarmViewModel.saveAlarm(alarm)
                 navController.navigate(Screen.HOME.route)
