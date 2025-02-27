@@ -9,4 +9,6 @@ interface AlarmRepository {
     suspend fun saveAlarm(alarm: Alarm)
     suspend fun deleteAlarm(id: Long?)
     suspend fun saveNfc(nfcTag: NfcTag)
+    suspend fun getAllNfcTags(): List<NfcTag>
+    suspend fun deleteNfcTag(serialNumber: String)
 }

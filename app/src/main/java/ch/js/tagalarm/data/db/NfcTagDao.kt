@@ -19,4 +19,7 @@ interface NfcTagDao {
 
     @Update
     suspend fun update(nfcTag: NfcTagEntity)
+
+    @Query("DELETE FROM nfc WHERE serial_number = :serialNumber")
+    suspend fun deleteBySerialNumber(serialNumber: String)
 }

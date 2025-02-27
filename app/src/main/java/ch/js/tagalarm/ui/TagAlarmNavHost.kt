@@ -40,7 +40,7 @@ fun TagAlarmNavHost(
             )
         }
         composable(Screen.SETTINGS.route) {
-            SettingsScreen(navController = navController)
+            SettingsScreen(navController = navController, alarmViewModel)
         }
         // ALARM_EDIT route with an optional Long argument "alarmId"
         composable(

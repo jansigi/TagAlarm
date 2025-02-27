@@ -8,6 +8,7 @@ import ch.js.tagalarm.data.model.NfcTag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -18,53 +19,68 @@ import javax.inject.Inject
 class AlarmViewModel @Inject constructor(
     private val alarmRepository: AlarmRepository,
 ) : ViewModel() {
+
     private val _alarms = MutableStateFlow(emptyList<Alarm>())
+    private val _nfcTags = MutableStateFlow(emptyList<NfcTag>())
+
+    val nfcTags = _nfcTags
+        .onStart {
+            viewModelScope.launch {
+                loadAllNfcTags()
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     val alarms = _alarms
         .onStart {
             viewModelScope.launch {
-                update()
+                updateAlarms()
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    fun saveAlarm(alarm: Alarm) {
-        viewModelScope.launch {
-            alarmRepository.saveAlarm(alarm)
-            update()
         }
-    }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun toggleActive(alarm: Alarm) {
         viewModelScope.launch {
             alarmRepository.saveAlarm(alarm.copy(active = !alarm.active))
-            update()
+            updateAlarms()
         }
     }
 
     fun removeAlarm(id: Long?) {
         viewModelScope.launch {
             alarmRepository.deleteAlarm(id)
-            update()
+            updateAlarms()
         }
     }
 
-    fun onNfcTagScanned(serialNumber: String) {
+    fun saveAlarm(alarm: Alarm) {
         viewModelScope.launch {
-            val matchingAlarms = alarmRepository.getAllAlarms()
-                .filter { it.nfcSerial == serialNumber && it.active }
-            matchingAlarms.forEach { alarm ->
-                alarmRepository.saveAlarm(alarm.copy(active = false))
-            }
-            update()
+            alarmRepository.saveAlarm(alarm)
+            updateAlarms()
         }
     }
 
-    fun registerNfcTag(nfcTag: NfcTag) {
+    suspend fun loadAllNfcTags() {
+        alarmRepository.getAllNfcTags().let { allNfcTags ->
+            _nfcTags.update { allNfcTags }
+        }
+    }
+
+    fun addNfcTag(name: String, serialNumber: String) {
         viewModelScope.launch {
-            alarmRepository.saveNfc(nfcTag)
+            alarmRepository.saveNfc(NfcTag(serialNumber, name))
+            loadAllNfcTags()
         }
     }
 
-    private suspend fun update() {
+    fun deleteNfcTag(serialNumber: String) {
+        viewModelScope.launch {
+            alarmRepository.deleteNfcTag(serialNumber)
+            loadAllNfcTags()
+        }
+    }
+
+    private suspend fun updateAlarms() {
         alarmRepository.getAllAlarms().let { allAlarms ->
             _alarms.update { allAlarms }
         }

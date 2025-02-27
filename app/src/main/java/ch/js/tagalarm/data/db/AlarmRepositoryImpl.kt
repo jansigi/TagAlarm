@@ -81,8 +81,23 @@ class AlarmRepositoryImpl(
         withContext(Dispatchers.IO) {
             val nfcTagEntity = NfcTagEntity(
                 serialNumber = nfcTag.serialNumber,
-                name = nfcTag.name
+                name = nfcTag.name,
             )
             nfcTagDao.insertIfNotExists(nfcTagEntity)
+        }
+
+    override suspend fun getAllNfcTags(): List<NfcTag> =
+        withContext(Dispatchers.IO) {
+            nfcTagDao.getAll().map {
+                NfcTag(
+                    serialNumber = it.serialNumber,
+                    name = it.name,
+                )
+            }
+        }
+
+    override suspend fun deleteNfcTag(serialNumber: String) =
+        withContext(Dispatchers.IO) {
+            nfcTagDao.deleteBySerialNumber(serialNumber)
         }
 }
