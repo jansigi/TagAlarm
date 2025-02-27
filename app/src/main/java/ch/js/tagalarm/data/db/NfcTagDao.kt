@@ -11,8 +11,8 @@ interface NfcTagDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIfNotExists(nfcTag: NfcTagEntity)
 
-    @Query("SELECT * FROM nfc WHERE nfc_id = :id")
-    suspend fun getNfcTagEntity(id: String): NfcTagEntity?
+    @Query("SELECT * FROM nfc WHERE serial_number = :serialNumber")
+    suspend fun getNfcTagEntityBySerialNumber(serialNumber: String): NfcTagEntity?
 
     @Query("SELECT * FROM nfc")
     suspend fun getAll(): List<NfcTagEntity>

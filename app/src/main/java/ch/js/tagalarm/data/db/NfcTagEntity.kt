@@ -6,8 +6,9 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "nfc")
 data class NfcTagEntity(
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "nfc_id")
-    val id: Long = 0,
-    // TODO add specific fields to save NFC-Tag
+    @PrimaryKey
+    @ColumnInfo(name = "serial_number")
+    val serialNumber: String,
+    @ColumnInfo(name = "name")
+    val name: String,
 )

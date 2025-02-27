@@ -1,3 +1,6 @@
 package ch.js.tagalarm.data.model
 
-data class NfcTag(val id: Long)
+data class NfcTag(
+    val serialNumber: String,
+    val name: String = "NFC Tag"
+)

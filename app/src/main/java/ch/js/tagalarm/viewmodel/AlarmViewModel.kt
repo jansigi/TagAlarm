@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.js.tagalarm.data.db.AlarmRepository
 import ch.js.tagalarm.data.model.Alarm
+import ch.js.tagalarm.data.model.NfcTag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,6 +37,23 @@ class AlarmViewModel @Inject constructor(
         viewModelScope.launch {
             alarmRepository.deleteAlarm(id)
             update()
+        }
+    }
+
+    fun onNfcTagScanned(serialNumber: String) {
+        viewModelScope.launch {
+            val matchingAlarms = alarmRepository.getAllAlarms()
+                .filter { it.nfcSerial == serialNumber && it.active }
+            matchingAlarms.forEach { alarm ->
+                alarmRepository.saveAlarm(alarm.copy(active = false))
+            }
+            update()
+        }
+    }
+
+    fun registerNfcTag(nfcTag: NfcTag) {
+        viewModelScope.launch {
+            alarmRepository.saveNfc(nfcTag)
         }
     }
 

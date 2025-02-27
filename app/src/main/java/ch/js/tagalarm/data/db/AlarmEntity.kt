@@ -11,10 +11,10 @@ import java.time.LocalTime
     foreignKeys = [
         ForeignKey(
             entity = NfcTagEntity::class,
-            parentColumns = arrayOf("nfc_id"),
-            childColumns = arrayOf("nfc_id"),
-            onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.CASCADE,
+            parentColumns = arrayOf("serial_number"),
+            childColumns = arrayOf("nfc_serial"),
+            onUpdate = ForeignKey.SET_NULL,
+            onDelete = ForeignKey.SET_NULL,
         ),
     ],
 )
@@ -25,6 +25,6 @@ data class AlarmEntity(
     var active: Boolean,
     @ColumnInfo(defaultValue = "Alarm")
     var description: String,
-    @ColumnInfo(name = "nfc_id")
-    var nfcId: Long?,
+    @ColumnInfo(name = "nfc_serial")
+    var nfcSerial: String?,
 )

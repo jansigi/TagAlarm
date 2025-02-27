@@ -17,7 +17,7 @@ class AlarmRepositoryImpl(
                     time = it.time,
                     active = it.active,
                     description = it.description,
-                    nfcId = it.nfcId,
+                    nfcSerial = it.nfcSerial,
                 )
             }
         }
@@ -30,7 +30,7 @@ class AlarmRepositoryImpl(
                     time = it.time,
                     active = it.active,
                     description = it.description,
-                    nfcId = it.nfcId,
+                    nfcSerial = it.nfcSerial,
                 )
             }
         }
@@ -43,7 +43,7 @@ class AlarmRepositoryImpl(
                     time = alarm.time,
                     active = alarm.active,
                     description = alarm.description,
-                    nfcId = alarm.nfcId,
+                    nfcSerial = alarm.nfcSerial,
                 )
             } else {
                 AlarmEntity(
@@ -51,7 +51,7 @@ class AlarmRepositoryImpl(
                     time = alarm.time,
                     active = alarm.active,
                     description = alarm.description,
-                    nfcId = alarm.nfcId,
+                    nfcSerial = alarm.nfcSerial,
                 )
             }
             if (foundAlarm == null) {
@@ -71,7 +71,7 @@ class AlarmRepositoryImpl(
                         time = alarm.time,
                         active = alarm.active,
                         description = alarm.description,
-                        nfcId = alarm.nfcId,
+                        nfcSerial = alarm.nfcSerial,
                     ),
                 )
             }
@@ -79,7 +79,10 @@ class AlarmRepositoryImpl(
 
     override suspend fun saveNfc(nfcTag: NfcTag) =
         withContext(Dispatchers.IO) {
-            val nfcTagEntity = NfcTagEntity(id = nfcTag.id)
+            val nfcTagEntity = NfcTagEntity(
+                serialNumber = nfcTag.serialNumber,
+                name = nfcTag.name
+            )
             nfcTagDao.insertIfNotExists(nfcTagEntity)
         }
 }
