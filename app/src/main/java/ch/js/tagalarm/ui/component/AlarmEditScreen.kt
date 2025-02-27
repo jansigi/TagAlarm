@@ -3,8 +3,10 @@ package ch.js.tagalarm.ui.component
 import android.app.TimePickerDialog
 import android.content.Context
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -45,8 +48,8 @@ fun AlarmEditScreen(
     val existingAlarm = alarmsState.find { it.id == alarmId }
 
     var time by remember { mutableStateOf(existingAlarm?.time ?: LocalTime.of(LocalTime.now().hour, LocalTime.now().minute)) }
-    var description by remember { mutableStateOf(existingAlarm?.description ?: "New Alarm") }
-    var selectedNfcTagSerial by remember { mutableStateOf(existingAlarm?.nfcSerial ?: "") }
+    var description by remember { mutableStateOf(existingAlarm?.description.orEmpty()) }
+    var selectedNfcTagSerial by remember { mutableStateOf(existingAlarm?.nfcSerial.orEmpty()) }
     var showTimePicker by remember { mutableStateOf(false) }
 
     if (showTimePicker) {
@@ -71,18 +74,23 @@ fun AlarmEditScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = { showTimePicker = true },
-        ) {
-            Text(text = "Pick Time: $time")
+        Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+            Text(text = "Pick Time:")
+            Spacer(modifier = Modifier.padding(20.dp))
+            Button(
+                onClick = { showTimePicker = true },
+            ) {
+                Text(text = "$time")
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        Text(text = "Description:")
         OutlinedTextField(
             value = description,
+            placeholder = { Text("Alarm") },
             onValueChange = { description = it },
-            label = { Text("Description") },
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -141,7 +149,7 @@ fun AlarmEditScreen(
                     id = existingAlarm?.id,
                     time = time,
                     active = true,
-                    description = description,
+                    description = description.ifBlank { "Alarm" },
                     nfcSerial = selectedNfcTagSerial.ifBlank { null },
                 )
                 alarmViewModel.saveAlarm(alarm)
