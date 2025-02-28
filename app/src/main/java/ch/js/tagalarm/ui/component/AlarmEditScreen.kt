@@ -2,7 +2,6 @@ package ch.js.tagalarm.ui.component
 
 import android.app.TimePickerDialog
 import android.content.Context
-import android.os.Vibrator
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

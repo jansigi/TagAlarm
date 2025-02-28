@@ -21,13 +21,14 @@ class BootReceiver : BroadcastReceiver() {
         if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
             // Re-schedule all active alarms
             CoroutineScope(Dispatchers.IO).launch {
-                val (activeAlarms, inactiveAlarms) = alarmRepository.getAllAlarms().fold(emptyList<Alarm>() to emptyList<Alarm>()) { acc, alarm ->
-                    if (alarm.active) {
-                        acc.first + alarm to acc.second
-                    } else {
-                        acc.first to acc.second + alarm
+                val (activeAlarms, inactiveAlarms) =
+                    alarmRepository.getAllAlarms().fold(emptyList<Alarm>() to emptyList<Alarm>()) { acc, alarm ->
+                        if (alarm.active) {
+                            acc.first + alarm to acc.second
+                        } else {
+                            acc.first to acc.second + alarm
+                        }
                     }
-                }
                 activeAlarms.forEach { alarm ->
                     AlarmScheduler.scheduleAlarm(context, alarm)
                 }

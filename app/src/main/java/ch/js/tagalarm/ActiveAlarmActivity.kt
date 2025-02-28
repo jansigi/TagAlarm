@@ -103,4 +103,3 @@ class ActiveAlarmActivity : ComponentActivity() {
         vibrator = null
     }
 }
-

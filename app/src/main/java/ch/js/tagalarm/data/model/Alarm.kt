@@ -7,5 +7,5 @@ data class Alarm(
     val time: LocalTime,
     val active: Boolean,
     val description: String = "Alarm",
-    val nfcSerial: String? = null
+    val nfcSerial: String? = null,
 )
