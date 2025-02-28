@@ -2,6 +2,7 @@ package ch.js.tagalarm.ui.component
 
 import android.app.Activity
 import android.nfc.NfcAdapter
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,28 +42,45 @@ import ch.js.tagalarm.R
 import ch.js.tagalarm.viewmodel.AlarmViewModel
 import java.util.Locale
 
+const val INCORRECT_NFC_TAG = "Incorrect NFC-Tag"
+private const val CORRECT_NFC_TAG = "Correct NFC-Tag"
+
 @Composable
 fun NfcScanScreen(
+    alarmId: Long? = null,
     navController: NavController,
     alarmViewModel: AlarmViewModel,
+    onClose: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val activity = context as Activity
+    val alarms by alarmViewModel.alarms.collectAsState()
+
     val nfcAdapter = remember { NfcAdapter.getDefaultAdapter(activity) }
 
     var scannedSerial by remember { mutableStateOf<String?>(null) }
+    var toastMessage by remember { mutableStateOf<String?>(null) }
     var shouldClose by remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
         if (nfcAdapter != null) {
             val callback = NfcAdapter.ReaderCallback { tag ->
                 val serialNumber = parseTagIdToHex(tag.id)
-                alarmViewModel.addNfcTag(
-                    name = "Scanned NFC Tag",
-                    serialNumber = serialNumber,
-                )
                 scannedSerial = serialNumber
-                shouldClose = true
+                val foundAlarm = alarms.find { it.id == alarmId }
+                if (foundAlarm == null) {
+                    alarmViewModel.addNfcTag(
+                        name = "NFC Tag",
+                        serialNumber = serialNumber,
+                    )
+                    shouldClose = true
+                } else if (foundAlarm.nfcSerial == scannedSerial) {
+                    toastMessage = CORRECT_NFC_TAG
+                    alarmViewModel.toggleActive(foundAlarm)
+                    shouldClose = true
+                } else {
+                    toastMessage = INCORRECT_NFC_TAG
+                }
             }
             nfcAdapter.enableReaderMode(
                 activity,
@@ -82,42 +101,40 @@ fun NfcScanScreen(
 
     LaunchedEffect(shouldClose) {
         if (shouldClose) {
+            onClose()
             navController.popBackStack()
         }
     }
 
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.5f)),
-        color = Color.Transparent,
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
+    if (toastMessage != null) {
+        Toast.makeText(LocalContext.current, toastMessage, Toast.LENGTH_SHORT).show()
+        if (toastMessage == INCORRECT_NFC_TAG) {
+            navController.popBackStack()
+        }
+        toastMessage = null
+    }
+
+    if (scannedSerial == null) {
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f)),
+            color = Color.Transparent,
         ) {
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier
-                    .wrapContentSize()
-                    .padding(24.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
             ) {
-                if (scannedSerial == null) {
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(24.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                ) {
                     NfcScanInstructions(
                         onClose = { navController.popBackStack() },
                     )
-                } else {
-                    Column(
-                        modifier = Modifier.padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            text = "Scanned Serial: $scannedSerial\nSaving & closing...",
-                            fontSize = 16.sp,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
                 }
             }
         }

@@ -1,5 +1,6 @@
 package ch.js.tagalarm.ui.component
 
+import android.os.Vibrator
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +31,7 @@ import ch.js.tagalarm.viewmodel.AlarmViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    vibrator: Vibrator?,
     navController: NavController,
     alarmViewModel: AlarmViewModel,
 ) {
@@ -73,7 +75,7 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.Top,
             ) {
                 items(alarmsState) { alarm ->
-                    AlarmCard(alarm, navController, alarmViewModel)
+                    AlarmCard(alarm, navController, alarmViewModel, vibrator)
                 }
             }
 

@@ -1,5 +1,7 @@
 package ch.js.tagalarm.ui.component
 
+import android.os.VibrationEffect
+import android.os.Vibrator
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,14 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import ch.js.tagalarm.data.model.Alarm
 import ch.js.tagalarm.ui.Screen
 import ch.js.tagalarm.viewmodel.AlarmViewModel
 
 @Composable
-fun AlarmCard(alarm: Alarm, navController: NavController, alarmViewModel: AlarmViewModel) {
+fun AlarmCard(alarm: Alarm, navController: NavController, alarmViewModel: AlarmViewModel, vibrator: Vibrator?) {
     Card(
         modifier = Modifier
             .padding(10.dp)
@@ -48,6 +49,7 @@ fun AlarmCard(alarm: Alarm, navController: NavController, alarmViewModel: AlarmV
                 Switch(
                     checked = alarm.active,
                     onCheckedChange = {
+                        vibrator?.vibrate(VibrationEffect.createOneShot(100, 1))
                         alarmViewModel.toggleActive(alarm)
                     },
                 )

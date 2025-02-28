@@ -7,6 +7,9 @@
         android:name="android.hardware.nfc"
         android:required="true" />
 
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:name=".TagAlarmApp"
         android:allowBackup="true"
@@ -26,6 +29,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
+        <!-- The activity that pops up when the alarm goes off -->
+        <activity
+            android:name=".ActiveAlarmActivity"
+            android:exported="true" />
+        <!--            android:theme="@style/Theme.Material3.DayNight.NoActionBar" />-->
 
+        <receiver
+            android:name=".viewmodel.AlarmReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".viewmodel.BootReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+    </application>
 </manifest>

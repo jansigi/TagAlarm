@@ -1,6 +1,7 @@
 package ch.js.tagalarm.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import ch.js.tagalarm.data.db.AlarmRepository
 import ch.js.tagalarm.data.model.Alarm
@@ -8,7 +9,6 @@ import ch.js.tagalarm.data.model.NfcTag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -18,8 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AlarmViewModel @Inject constructor(
     private val alarmRepository: AlarmRepository,
-) : ViewModel() {
-
+    application: Application,
+) : AndroidViewModel(application) {
     private val _alarms = MutableStateFlow(emptyList<Alarm>())
     private val _nfcTags = MutableStateFlow(emptyList<NfcTag>())
 
@@ -57,6 +57,13 @@ class AlarmViewModel @Inject constructor(
         viewModelScope.launch {
             alarmRepository.saveAlarm(alarm)
             updateAlarms()
+
+            // Schedule or cancel it based on the alarm's 'active' state
+            if (alarm.active) {
+                AlarmScheduler.scheduleAlarm(getApplication(), alarm)
+            } else {
+                AlarmScheduler.cancelAlarm(getApplication(), alarm)
+            }
         }
     }
 
