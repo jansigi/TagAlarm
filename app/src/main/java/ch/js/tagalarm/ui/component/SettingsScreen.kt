@@ -1,5 +1,6 @@
 package ch.js.tagalarm.ui.component
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,6 +38,7 @@ fun SettingsScreen(
     alarmViewModel: AlarmViewModel,
 ) {
     val nfcTags by alarmViewModel.nfcTags.collectAsState()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -92,6 +95,7 @@ fun SettingsScreen(
                         IconButton(
                             onClick = {
                                 alarmViewModel.deleteNfcTag(tag.serialNumber)
+                                Toast.makeText(context, "Successfully deleted Tag", Toast.LENGTH_SHORT).show()
                             },
                         ) {
                             Icon(Icons.Default.Delete, contentDescription = "Delete Tag")

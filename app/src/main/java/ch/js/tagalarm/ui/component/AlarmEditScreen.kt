@@ -2,6 +2,7 @@ package ch.js.tagalarm.ui.component
 
 import android.app.TimePickerDialog
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -58,10 +59,11 @@ fun AlarmEditScreen(
     var description by remember { mutableStateOf(existingAlarm?.description.orEmpty()) }
     var selectedNfcTag by remember { mutableStateOf(nfcTagsState.find { existingAlarm?.nfcSerial == it.serialNumber }) }
     var showTimePicker by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     if (showTimePicker) {
         showTimePickerDialog(
-            context = LocalContext.current,
+            context = context,
             initialTime = time,
             onTimeSelected = { selectedTime ->
                 time = selectedTime
@@ -105,6 +107,7 @@ fun AlarmEditScreen(
                                 nfcSerial = selectedNfcTag?.serialNumber,
                             )
                             alarmViewModel.saveAlarm(alarm)
+                            Toast.makeText(context, "Successfully saved Alarm", Toast.LENGTH_SHORT).show()
                             navController.navigate(Screen.HOME.route)
                         },
                     ) {
@@ -197,6 +200,7 @@ fun AlarmEditScreen(
                 Button(
                     onClick = {
                         alarmViewModel.removeAlarm(existingAlarm.id)
+                        Toast.makeText(context, "Successfully deleted Alarm", Toast.LENGTH_SHORT).show()
                         navController.navigate(Screen.HOME.route)
                     },
                 ) {
