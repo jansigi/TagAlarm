@@ -5,5 +5,4 @@ data class NfcTag(
     val name: String = "NFC Tag",
 ) {
     override fun toString(): String = "$name ($serialNumber)"
-
 }

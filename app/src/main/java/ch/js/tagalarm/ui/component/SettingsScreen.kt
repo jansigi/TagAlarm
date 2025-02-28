@@ -36,7 +36,6 @@ fun SettingsScreen(
     alarmViewModel: AlarmViewModel,
 ) {
     val nfcTags by alarmViewModel.nfcTags.collectAsState()
-    alarmViewModel.saveNfcTag("Bathroom-Tag", "D0:32:I9:2f:7P")
 
     Scaffold(
         topBar = {

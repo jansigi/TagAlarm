@@ -56,7 +56,7 @@ fun AlarmEditScreen(
 
     var time by remember { mutableStateOf(existingAlarm?.time ?: LocalTime.of(LocalTime.now().hour, LocalTime.now().minute)) }
     var description by remember { mutableStateOf(existingAlarm?.description.orEmpty()) }
-    var selectedNfcTag by remember { mutableStateOf(existingAlarm?.nfcSerial.orEmpty()) }
+    var selectedNfcTag by remember { mutableStateOf(nfcTagsState.find { existingAlarm?.nfcSerial == it.serialNumber }) }
     var showTimePicker by remember { mutableStateOf(false) }
 
     if (showTimePicker) {
@@ -78,7 +78,7 @@ fun AlarmEditScreen(
                 title = {
                     Text(
                         text = if (existingAlarm != null) "Edit Alarm" else "Create Alarm",
-                        fontSize = 40.sp,
+                        fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
                     )
                 },
@@ -102,7 +102,7 @@ fun AlarmEditScreen(
                                 time = time,
                                 active = true,
                                 description = description.ifBlank { "Alarm" },
-                                nfcSerial = selectedNfcTag.ifBlank { null },
+                                nfcSerial = selectedNfcTag?.serialNumber,
                             )
                             alarmViewModel.saveAlarm(alarm)
                             navController.navigate(Screen.HOME.route)
@@ -149,7 +149,7 @@ fun AlarmEditScreen(
             var mExpanded by remember { mutableStateOf(false) }
             Box {
                 OutlinedTextField(
-                    value = selectedNfcTag,
+                    value = selectedNfcTag?.toString().orEmpty(),
                     onValueChange = {},
                     readOnly = true,
                     modifier = Modifier
@@ -173,7 +173,7 @@ fun AlarmEditScreen(
                         DropdownMenuItem(
                             text = { Text(item.toString()) },
                             onClick = {
-                                selectedNfcTag = item.toString()
+                                selectedNfcTag = item
                                 mExpanded = false
                             },
                         )
