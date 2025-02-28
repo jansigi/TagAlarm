@@ -13,13 +13,11 @@ class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val alarmId = intent.getLongExtra("alarm_id", -1L)
 
-        // Erstelle einen Intent für ActiveAlarmActivity
         val alarmIntent = Intent(context, ActiveAlarmActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             putExtra("alarm_id", alarmId)
         }
 
-        // Erstelle einen PendingIntent für den Full-Screen-Intent
         val pendingIntent = PendingIntent.getActivity(
             context,
             alarmId.toInt(),
@@ -27,7 +25,6 @@ class AlarmReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        // Erstelle oder hole den NotificationManager und den zugehörigen Channel
         val channelId = "alarm_channel"
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channel = NotificationChannel(

@@ -19,7 +19,6 @@ class BootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent?) {
         if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
-            // Re-schedule all active alarms
             CoroutineScope(Dispatchers.IO).launch {
                 val (activeAlarms, inactiveAlarms) =
                     alarmRepository.getAllAlarms().fold(emptyList<Alarm>() to emptyList<Alarm>()) { acc, alarm ->

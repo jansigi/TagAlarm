@@ -58,7 +58,6 @@ class AlarmViewModel @Inject constructor(
             alarmRepository.saveAlarm(alarm)
             updateAlarms()
 
-            // Schedule or cancel it based on the alarm's 'active' state
             if (alarm.active) {
                 AlarmScheduler.scheduleAlarm(getApplication(), alarm)
             } else {

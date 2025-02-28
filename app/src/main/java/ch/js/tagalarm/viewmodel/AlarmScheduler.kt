@@ -76,7 +76,6 @@ object AlarmScheduler {
         val dateTime: LocalDateTime = if (alarmTime.isAfter(now)) {
             LocalDateTime.of(today, alarmTime)
         } else {
-            // If time already passed today, schedule for tomorrow
             LocalDateTime.of(today.plusDays(1), alarmTime)
         }
         return dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
