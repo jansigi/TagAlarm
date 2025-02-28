@@ -1,5 +1,7 @@
 package ch.js.tagalarm.viewmodel
 
+import android.R
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -25,8 +27,19 @@ class AlarmReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        val channelId = "alarm_channel"
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notification = createNotification(notificationManager, context, pendingIntent)
+
+        notificationManager.notify(alarmId.toInt(), notification)
+        context.startActivity(alarmIntent)
+    }
+
+    private fun createNotification(
+        notificationManager: NotificationManager,
+        context: Context,
+        pendingIntent: PendingIntent?,
+    ): Notification {
+        val channelId = "alarm_channel"
         val channel = NotificationChannel(
             channelId,
             "Alarm Notifications",
@@ -36,8 +49,8 @@ class AlarmReceiver : BroadcastReceiver() {
         }
         notificationManager.createNotificationChannel(channel)
 
-        val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+        return NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(R.drawable.ic_lock_idle_alarm)
             .setContentTitle("Alarm")
             .setContentText("Alarm is ringing!")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -45,8 +58,5 @@ class AlarmReceiver : BroadcastReceiver() {
             .setFullScreenIntent(pendingIntent, true)
             .setAutoCancel(true)
             .build()
-
-        notificationManager.notify(alarmId.toInt(), notification)
-        context.startActivity(alarmIntent)
     }
 }
