@@ -43,7 +43,7 @@ fun HomeScreen(
                 title = {
                     Text(
                         text = "TagAlarm",
-                        fontSize = 50.sp,
+                        fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
                     )
                 },

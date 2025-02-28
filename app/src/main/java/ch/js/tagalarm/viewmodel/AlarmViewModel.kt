@@ -73,7 +73,7 @@ class AlarmViewModel @Inject constructor(
         }
     }
 
-    fun addNfcTag(name: String, serialNumber: String) {
+    fun saveNfcTag(name: String, serialNumber: String) {
         viewModelScope.launch {
             alarmRepository.saveNfc(NfcTag(serialNumber, name))
             loadAllNfcTags()

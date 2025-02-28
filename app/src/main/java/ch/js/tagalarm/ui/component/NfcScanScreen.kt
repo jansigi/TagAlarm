@@ -69,7 +69,7 @@ fun NfcScanScreen(
                 scannedSerial = serialNumber
                 val foundAlarm = alarms.find { it.id == alarmId }
                 if (foundAlarm == null) {
-                    alarmViewModel.addNfcTag(
+                    alarmViewModel.saveNfcTag(
                         name = "NFC Tag",
                         serialNumber = serialNumber,
                     )
