@@ -75,7 +75,7 @@ fun SettingsScreen(
             ) {
                 Text(
                     text = "NFC",
-                    fontSize = 20.sp
+                    fontSize = 20.sp,
                 )
             }
 
@@ -89,7 +89,7 @@ fun SettingsScreen(
                             .fillMaxWidth()
                             .padding(vertical = 4.dp),
                     ) {
-                        Text(text = "${tag.name} (${tag.serialNumber})" )
+                        Text(text = tag.toString())
                         IconButton(
                             onClick = {
                                 alarmViewModel.deleteNfcTag(tag.serialNumber)

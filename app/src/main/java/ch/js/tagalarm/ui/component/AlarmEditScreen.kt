@@ -17,9 +17,13 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -29,13 +33,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import ch.js.tagalarm.data.model.Alarm
 import ch.js.tagalarm.ui.Screen
 import ch.js.tagalarm.viewmodel.AlarmViewModel
 import java.time.LocalTime
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlarmEditScreen(
     navController: NavController,
@@ -49,7 +56,7 @@ fun AlarmEditScreen(
 
     var time by remember { mutableStateOf(existingAlarm?.time ?: LocalTime.of(LocalTime.now().hour, LocalTime.now().minute)) }
     var description by remember { mutableStateOf(existingAlarm?.description.orEmpty()) }
-    var selectedNfcTagSerial by remember { mutableStateOf(existingAlarm?.nfcSerial.orEmpty()) }
+    var selectedNfcTag by remember { mutableStateOf(existingAlarm?.nfcSerial.orEmpty()) }
     var showTimePicker by remember { mutableStateOf(false) }
 
     if (showTimePicker) {
@@ -65,116 +72,138 @@ fun AlarmEditScreen(
         )
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-    ) {
-        Text(text = if (existingAlarm != null) "Edit Alarm" else "Create Alarm")
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "Pick Time:")
-            Spacer(modifier = Modifier.padding(20.dp))
-            Button(
-                onClick = { showTimePicker = true },
-            ) {
-                Text(text = "$time")
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(text = "Description:")
-        OutlinedTextField(
-            value = description,
-            placeholder = { Text("Alarm") },
-            onValueChange = { description = it },
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(text = "Select an NFC Tag:")
-        var mExpanded by remember { mutableStateOf(false) }
-        Box {
-            OutlinedTextField(
-                value = selectedNfcTagSerial,
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { mExpanded = true },
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = "Dropdown Arrow",
-                        modifier = Modifier.clickable { mExpanded = true },
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = if (existingAlarm != null) "Edit Alarm" else "Create Alarm",
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Bold,
                     )
+                },
+                actions = {
+                    TextButton(
+                        onClick = {
+                            navController.navigate(Screen.HOME.route)
+                        },
+                    ) {
+                        Text(
+                            text = "cancel",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    }
+
+                    TextButton(
+                        onClick = {
+                            val alarm = Alarm(
+                                id = existingAlarm?.id,
+                                time = time,
+                                active = true,
+                                description = description.ifBlank { "Alarm" },
+                                nfcSerial = selectedNfcTag.ifBlank { null },
+                            )
+                            alarmViewModel.saveAlarm(alarm)
+                            navController.navigate(Screen.HOME.route)
+                        },
+                    ) {
+                        Text(
+                            text = "save",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    }
                 },
             )
-
-            DropdownMenu(
-                expanded = mExpanded,
-                onDismissRequest = { mExpanded = false },
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                nfcTagsState.forEach { item ->
-                    DropdownMenuItem(
-                        text = { Text(item.name + item.serialNumber) },
-                        onClick = {
-                            selectedNfcTagSerial = item.serialNumber
-                            mExpanded = false
-                        },
-                    )
+        },
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(start = 30.dp, end = 30.dp)
+                .fillMaxSize(),
+        ) {
+            Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "Pick Time:")
+                Spacer(modifier = Modifier.padding(20.dp))
+                Button(
+                    onClick = { showTimePicker = true },
+                ) {
+                    Text(text = "$time")
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-        Button(
-            onClick = {
-                navController.navigate(Screen.NFC_SCAN.route)
-            },
-        ) {
-            Text("Scan New Tag")
-        }
+            Text(text = "Description:")
+            OutlinedTextField(
+                value = description,
+                placeholder = { Text("Alarm") },
+                onValueChange = { description = it },
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-        Button(
-            onClick = {
-                val alarm = Alarm(
-                    id = existingAlarm?.id,
-                    time = time,
-                    active = true,
-                    description = description.ifBlank { "Alarm" },
-                    nfcSerial = selectedNfcTagSerial.ifBlank { null },
+            Text(text = "Select an NFC Tag:")
+            var mExpanded by remember { mutableStateOf(false) }
+            Box {
+                OutlinedTextField(
+                    value = selectedNfcTag,
+                    onValueChange = {},
+                    readOnly = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { mExpanded = true },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = "Dropdown Arrow",
+                            modifier = Modifier.clickable { mExpanded = true },
+                        )
+                    },
                 )
-                alarmViewModel.saveAlarm(alarm)
-                navController.navigate(Screen.HOME.route)
-            },
-        ) {
-            Text("Save Alarm")
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
+                DropdownMenu(
+                    expanded = mExpanded,
+                    onDismissRequest = { mExpanded = false },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    nfcTagsState.forEach { item ->
+                        DropdownMenuItem(
+                            text = { Text(item.toString()) },
+                            onClick = {
+                                selectedNfcTag = item.toString()
+                                mExpanded = false
+                            },
+                        )
+                    }
+                }
+            }
 
-        if (existingAlarm != null) {
+            Spacer(modifier = Modifier.height(8.dp))
+
             Button(
                 onClick = {
-                    alarmViewModel.removeAlarm(existingAlarm.id)
-                    navController.navigate(Screen.HOME.route)
+                    navController.navigate(Screen.NFC_SCAN.route)
                 },
             ) {
-                Text("Delete Alarm")
+                Text("Scan New Tag")
             }
-            Spacer(modifier = Modifier.height(8.dp))
-        }
 
-        Button(onClick = { navController.navigate(Screen.HOME.route) }) {
-            Text("Cancel")
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (existingAlarm != null) {
+                Button(
+                    onClick = {
+                        alarmViewModel.removeAlarm(existingAlarm.id)
+                        navController.navigate(Screen.HOME.route)
+                    },
+                ) {
+                    Text("Delete Alarm")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
     }
 }
