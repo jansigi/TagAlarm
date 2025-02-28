@@ -9,4 +9,4 @@
 
 
 ## Weitere Infos
-- Es wurde beim Entwickeln mit Code-Completion oder mit ChatGPT unterschtützt.
+- Es wurde unterschtützt mit Code-Completion und/oder mit ChatGPT .
