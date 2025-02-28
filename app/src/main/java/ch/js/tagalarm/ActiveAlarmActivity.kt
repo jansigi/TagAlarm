@@ -7,17 +7,10 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import ch.js.tagalarm.data.db.AlarmRepository
-import ch.js.tagalarm.ui.Screen
-import ch.js.tagalarm.ui.component.AlarmRingingScreen
-import ch.js.tagalarm.ui.component.NfcScanScreen
-import ch.js.tagalarm.viewmodel.AlarmViewModel
+import ch.js.tagalarm.ui.ActiveAlarmNavHost
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -42,44 +35,16 @@ class ActiveAlarmActivity : ComponentActivity() {
         val alarmId = intent.getLongExtra("alarm_id", -1L)
 
         setContent {
-            val navController = rememberNavController()
-            val alarmViewModel: AlarmViewModel = hiltViewModel()
-
-            val onClose = {
-                stopAlarm()
-                stopVibrator()
-                startActivity(Intent(applicationContext, MainActivity::class.java))
-                finish()
-            }
-
-            NavHost(
-                navController = navController,
-                startDestination = Screen.ACTIVE_ALARM.route,
-            ) {
-                composable(Screen.ACTIVE_ALARM.route) {
-                    AlarmRingingScreen(
-                        navController = navController,
-                        alarmViewModel = alarmViewModel,
+            MaterialTheme {
+                Surface {
+                    ActiveAlarmNavHost(
                         alarmId = alarmId,
-                        onClose = onClose,
-                    )
-                }
-
-                composable(
-                    route = Screen.NFC_SCAN.route + "?alarmId={alarmId}",
-                    arguments = listOf(
-                        navArgument("alarmId") {
-                            type = NavType.LongType
-                            defaultValue = -1L
+                        onClose = {
+                            stopAlarm()
+                            stopVibrator()
+                            startActivity(Intent(applicationContext, MainActivity::class.java))
+                            finish()
                         },
-                    ),
-                ) { backStackEntry ->
-                    val alarmIdArgument = backStackEntry.arguments?.getLong("alarmId")
-                    NfcScanScreen(
-                        navController = navController,
-                        alarmViewModel = alarmViewModel,
-                        alarmId = alarmIdArgument,
-                        onClose = onClose,
                     )
                 }
             }
